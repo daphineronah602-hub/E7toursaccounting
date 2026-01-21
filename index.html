@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>E7 Tours and Travel - Crafting Memories: Interactive Accounting</title>
+<style>
+body { font-family: Arial, sans-serif; margin:0; padding:10px; background:#f4f6f8; }
+section { margin-bottom:30px; background:#fff; padding:20px; border-radius:8px; box-shadow:0 2px 6px rgba(0,0,0,0.05); }
+table { width:100%; border-collapse:collapse; margin-top:10px; }
+table th, table td { border:1px solid #ddd; padding:8px; text-align:center; }
+table th { background:#f1f1f1; }
+input, select, button { padding:10px; margin:5px 0; width:100%; box-sizing:border-box; }
+header h1 { margin:0; font-size:24px; }
+header h2 { margin:5px 0 20px 0; font-size:16px; color:#555; font-style:italic; }
+.auth-section { max-width:400px; margin:30px auto; padding:20px; background:#fff; border-radius:8px; box-shadow:0 2px 6px rgba(0,0,0,0.1); }
+.auth-section input { width:100%; margin:8px 0; padding:10px; }
+@media screen and (max-width:600px){
+  input, select, button { font-size:16px; }
+  table th, table td { font-size:12px; padding:6px; }
+}
+</style>
+</head>
+<body>
+
+<div class="auth-section" id="signupSection">
+<h2>Sign Up</h2>
+<input type="text" id="signupUsername" placeholder="Username">
+<input type="password" id="signupPassword" placeholder="Password">
+<button onclick="signup()">Sign Up</button>
+<p>Already have an account? <a href="#" onclick="showLogin()">Login here</a></p>
+</div>
+
+<div class="auth-section" id="loginSection" style="display:none;">
+<h2>Login</h2>
+<input type="text" id="username" placeholder="Username">
+<input type="password" id="password" placeholder="Password">
+<button onclick="login()">Login</button>
+<p>Don't have an account? <a href="#" onclick="showSignup()">Sign up here</a></p>
+</div>
+
+<div id="mainApp" style="display:none;">
+<header>
+<h1>E7 Tours and Travel</h1>
+<h2>CRAFTING MEMORIES – Financial & Accounting System</h2>
+<label><strong>Financial Year:</strong></label>
+<select id="financialYear" onchange="changeYear()">
+<option value="2024/2025">2024/2025</option>
+<option value="2025/2026">2025/2026</option>
+<option value="2026/2027">2026/2027</option>
+<option value="2027/2028">2027/2028</option>
+<option value="2028/2029">2028/2029</option>
+<option value="2029/2030">2029/2030</option>
+<option value="2030/2031">2030/2031</option>
+</select>
+<button onclick="window.print()">Print Page</button>
+</header>
+
+<section id="addTour">
+<h2>Add / Edit Tour & Payment</h2>
+<input type="text" id="tourCode" placeholder="Trip Code">
+<input type="text" id="tourName" placeholder="Tour Name">
+<input type="text" id="tourClient" placeholder="Client Name">
+<input type="number" id="tourTotal" placeholder="Total Tour Amount (UGX)">
+<input type="number" id="tourPaid" placeholder="Amount Paid Now (UGX)">
+<input type="date" id="tourDate">
+<table id="tourTable">
+<thead><tr><th>Trip Code</th><th>Tour Name</th><th>Client</th><th>Total (UGX)</th><th>Paid (UGX)</th><th>Balance (UGX)</th><th>Status</th><th>Date</th></tr></thead>
+<tbody></tbody>
+</table>
+</section>
+
+<section id="budget">
+<h2>Budget</h2>
+<input type="text" id="budgetCategory" placeholder="Category">
+<input type="number" id="budgetEstimated" placeholder="Estimated Amount">
+<input type="number" id="budgetSpent" placeholder="Spent Amount">
+<table id="budgetTable">
+<thead><tr><th>Category</th><th>Estimated (UGX)</th><th>Spent (UGX)</th><th>Balance (UGX)</th></tr></thead>
+<tbody></tbody>
+</table>
+</section>
+
+<section id="assetsLiabilities">
+<h2>Assets & Liabilities</h2>
+<h3>Assets</h3>
+<input type="text" id="assetName" placeholder="Asset Name">
+<input type="number" id="assetAmount" placeholder="Amount">
+<table id="assetTable">
+<thead><tr><th>Asset Name</th><th>Amount (UGX)</th></tr></thead>
+<tbody></tbody>
+</table>
+<h3>Liabilities</h3>
+<input type="text" id="liabilityName" placeholder="Liability Name">
+<input type="number" id="liabilityAmount" placeholder="Amount">
+<table id="liabilityTable">
+<thead><tr><th>Liability Name</th><th>Amount (UGX)</th></tr></thead>
+<tbody></tbody>
+</table>
+</section>
+
+<section id="visaPassport">
+<h2>Visa & Passport Processing</h2>
+<input type="text" id="vpClient" placeholder="Client Name">
+<input type="text" id="vpPassportNo" placeholder="Passport Number">
+<input type="date" id="vpIssueDate">
+<input type="number" id="vpCount" placeholder="Number of Passports">
+<input type="number" id="vpAmount" placeholder="Amount Paid (UGX)">
+<table id="vpTable">
+<thead><tr><th>Client</th><th>Passport No</th><th>Date Issued</th><th>Quantity</th><th>Amount (UGX)</th></tr></thead>
+<tbody></tbody>
+</table>
+</section>
+
+<script>
+// Signup/Login System
+let users = JSON.parse(localStorage.getItem('users')) || [];
+function signup(){
+  const u = document.getElementById('signupUsername').value;
+  const p = document.getElementById('signupPassword').value;
+  if(!u || !p){ alert('Fill all fields'); return; }
+  users = JSON.parse(localStorage.getItem('users')) || [];
+  if(users.find(x=>x.username===u)){ alert('Username exists'); return; }
+  users.push({username:u,password:p});
+  localStorage.setItem('users', JSON.stringify(users));
+  alert('Signup successful! Logging you in...');
+  document.getElementById('signupSection').style.display='none';
+  document.getElementById('mainApp').style.display='block';
+}
+function login(){
+  const u = document.getElementById('username').value;
+  const p = document.getElementById('password').value;
+  users = JSON.parse(localStorage.getItem('users')) || [];
+  if(users.find(x=>x.username===u && x.password===p)){
+    document.getElementById('loginSection').style.display='none';
+    document.getElementById('mainApp').style.display='block';
+  } else { alert('Invalid credentials'); }
+}
+function showLogin(){ document.getElementById('signupSection').style.display='none'; document.getElementById('loginSection').style.display='block'; }
+function showSignup(){ document.getElementById('loginSection').style.display='none'; document.getElementById('signupSection').style.display='block'; }
+
+// Add your accounting data logic here (tours, payments, budget, assets, liabilities, visa/passport) — keep all previous features intact
+</script>
+</body>
+</html>
